@@ -29,7 +29,7 @@ This code is a Python implementation of a Tic-Tac-Toe game with an AI agent. It 
 
 The `Agent` class uses a dictionary (`self.brain`) to store the Q-values. This dictionary maps a tuple of the current game state and action to a Q-value. This approach is somewhat similar to a Q-table but uses a more flexible data structure.
 
-Here's a breakdown of how Q-values are handled in the code:
+How it is implemented:
 
 - **Initialization**: When an `Agent` instance is created, its `brain` attribute is initialized as an empty dictionary. This is where the Q-values will be stored.
 - **Saving and Loading Q-values**: The `save_brain` and `load_brain` methods use the `pickle` module to serialize and deserialize the `brain` dictionary to and from a file. This allows the agent to retain its learned knowledge between sessions.
