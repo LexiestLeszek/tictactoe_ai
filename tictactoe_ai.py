@@ -129,4 +129,137 @@ class Agent:
             self.brain[state, action] = self.brain.get((state, action), 0.0) + _reward
             _reward *= self.discount_factor
 
+    def use_brain(self):
+        possible_actions = self.game.get_available_positions()
+        max_q_value = -1000
+        best_action = possible_actions[0]
+        for action in possible_actions:
+            q_value = self.brain.get((self.game.get_current_game_tuple(), action), 0.0)
+            if q_value > max_q_value:
+                best_action = action
+                max_q_value = q_value
+            # if they have same value, current action stays or they change with 50% chance
+            elif q_value == max_q_value and random.random() < 0.5:
+                best_action = action
+                max_q_value = q_value
+            elif len(possible_actions) == 9:
+                best_action = random.choice(possible_actions)
+                break
+
+        return best_action
+
+    def train_brain_x_byrandom(self):
+        for _ in range(self.episode):
+            if _ % 1000 == 0:
+                print('Episode: '+str(_))
+                self.epsilon -= self.eps_reduce_factor
+            move_history = []
+
+            while True:
+                
+                if sum(self.game.get_current_game()==1) == 0 or random.random()<self.epsilon:
+
+                    available_actions = self.game.get_available_positions()
+                    action_x = random.choice(available_actions)
+
+                    move_history.append([self.game.get_current_game_tuple(), action_x])
+
+                    # self.game always let the X play firstly and it changes the player then in backend
+                    self.game.make_move(action_x)
+
+                else:
+                    action_x = self.use_brain()
+
+                    move_history.append([self.game.get_current_game_tuple(), action_x])
+
+                    self.game.make_move(action_x)
+                
+                
+                if self.game.is_winner():
+                    self.reward(1 ,move_history, self.game.winner)
+                    break
+                
+                
+                available_actions = self.game.get_available_positions()
+                action_o = random.choice(available_actions)
+                self.game.make_move(action_o)
+
+                if self.game.is_winner():
+                        self.reward(1 ,move_history, self.game.winner)
+                        break
+
+        self.save_brain('X')
+        print('TRAINING IS FINISHED!')
+        print('RESULTS:')
+        print(self.results)
+
+    def train_brain_o_byrandom(self):
+        for _ in range(self.episode):
+            if _ % 1000 == 0:
+                print('Episode: '+str(_))
+                self.epsilon -= self.eps_reduce_factor
+            move_history = []
+            
+            while True:
+
+                available_actions = self.game.get_available_positions()
+                action_x = random.choice(available_actions)
+                
+                self.game.make_move(action_x)
+
+                
+                if self.game.is_winner():
+                    self.reward(-1 ,move_history, self.game.winner)
+                    break
+
+                if random.random()<self.epsilon:
+
+                    available_actions = self.game.get_available_positions()
+                    action_o = random.choice(available_actions)
+
+                    move_history.append([self.game.get_current_game_tuple(), action_o])
+
+                    self.game.make_move(action_o)
+
+                else:
+                    action_o = self.use_brain()
+
+                    move_history.append([self.game.get_current_game_tuple(), action_o])
+
+                    self.game.make_move(action_o)
+
+                if self.game.is_winner():
+                    self.reward(-1 ,move_history, self.game.winner)
+                    break
+
+        self.save_brain('O')
+        print('TRAINING IS DONE!')
+        print('RESULTS:')
+        print(self.results)
     
+    def play_with_user(self):
+        self.load_brain(self.player)
+        order = 1 if self.player=='X' else -1
+        while True:
+            if order == 1:
+                self.game.make_move(self.use_brain())
+                self.game.create_current_game()
+                order *= -1
+                if self.game.is_winner(isgame = True):
+                    break
+            else:
+                action_o = int(input('Which square?'))
+                self.game.make_move(action_o-1)
+                self.game.create_current_game()
+                order *= -1
+                if self.game.is_winner(isgame = True):
+                    break
+
+
+game = TicTacToe()
+
+agent = Agent(game, 'X',discount_factor = 0.6, episode = 100000)
+
+agent.train_brain_x_byrandom()
+
+agent.play_with_user()
