@@ -99,12 +99,12 @@ class Agent:
         self.eps_reduce_factor = eps_reduce_factor
 
     def save_brain(self, player):
-        with open('brain'+player, 'wb') as brain_file:
+        with open(f'brain{player}.pkl', 'wb') as brain_file:
             pickle.dump(self.brain, brain_file)
 
     def load_brain(self, player):
         try:
-            with open('brain'+player, 'rb') as brain_file:
+            with open(f'brain{player}.pkl', 'rb') as brain_file:
                 self.brain = pickle.load(brain_file)
         except:
             print('No model found. Training needed.') 
