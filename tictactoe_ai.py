@@ -1,4 +1,6 @@
 import numpy as np
+import random
+import pickle
 
 class TicTacToe:
     
@@ -82,3 +84,49 @@ class TicTacToe:
                 self.reset_game()
                 return -2
         return False
+
+class Agent:
+
+    def __init__(self, game, player = 'X', episode = 100000, epsilon = 0.9, discount_factor = 0.6, eps_reduce_factor = 0.01):
+
+        self.game = game
+        self.player = player
+        self.brain = dict()
+        self.episode = episode
+        self.epsilon = epsilon
+        self.discount_factor = discount_factor
+        self.results = {'X' : 0, 'O': 0, 'D': 0}
+        self.eps_reduce_factor = eps_reduce_factor
+
+    def save_brain(self, player):
+        with open('brain'+player, 'wb') as brain_file:
+            pickle.dump(self.brain, brain_file)
+
+    def reward(self, player, move_history, result):
+        _reward = 0
+        
+        if player == 1:
+            if result == 1:
+                _reward = 1
+                self.results['X'] += 1 
+            elif result == -1:
+                _reward = -1
+                self.results['O'] += 1 
+                
+        elif player == -1:
+            if result == 1:
+                _reward = -1
+                self.results['X'] += 1 
+            elif result == -1:
+                _reward = 1
+                self.results['O'] += 1
+                
+        if result == -2:
+             self.results['D'] += 1
+        move_history.reverse()
+        
+        for state, action in move_history:
+            self.brain[state, action] = self.brain.get((state, action), 0.0) + _reward
+            _reward *= self.discount_factor
+
+    
