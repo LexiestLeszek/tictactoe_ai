@@ -1,6 +1,6 @@
 # tictactoe_ai
 
-This code is a Python implementation of a Tic-Tac-Toe game with an AI agent. It uses NumPy for array operations, random for generating random numbers, and pickle for saving and loading the AI's knowledge (brain). The code is divided into two main classes: `TicTacToe` and `Agent`.
+This is a Python implementation of a Tic-Tac-Toe game with an AI agent. It uses NumPy for array operations, random for generating random numbers, and pickle for saving and loading the AI's knowledge (brain). The code is divided into two main classes: `TicTacToe` and `Agent`.
 
 ### `TicTacToe` Class:
 
