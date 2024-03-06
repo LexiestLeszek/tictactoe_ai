@@ -102,6 +102,13 @@ class Agent:
         with open('brain'+player, 'wb') as brain_file:
             pickle.dump(self.brain, brain_file)
 
+    def load_brain(self, player):
+        try:
+            with open('brain'+player, 'rb') as brain_file:
+                self.brain = pickle.load(brain_file)
+        except:
+            print('No model found. Training needed.') 
+
     def reward(self, player, move_history, result):
         _reward = 0
         
@@ -147,6 +154,7 @@ class Agent:
                 break
 
         return best_action
+
 
     def train_brain_x_byrandom(self):
         for _ in range(self.episode):
@@ -248,13 +256,12 @@ class Agent:
                 if self.game.is_winner(isgame = True):
                     break
             else:
-                action_o = int(input('Which square?'))
+                action_o = int(input('Choose square (1-9): '))
                 self.game.make_move(action_o-1)
                 self.game.create_current_game()
                 order *= -1
                 if self.game.is_winner(isgame = True):
                     break
-
 
 game = TicTacToe()
 
